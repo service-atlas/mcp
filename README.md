@@ -26,7 +26,7 @@ You will need to input the run command as `go run` and the optional arguments as
 
 **Note: You will need to set the `API_URL` environment variable to the url of the service dependency api.**
 
-To facilitate testing, a docker compose file is provided in the root of the project. You can run the docker compose file with the following command:
+To facilitate testing, a docker compose file is provided in the service map api project. You can run the docker compose file with the following command:
 
 ```bash
 docker compose -f service.compose.yml up -d
