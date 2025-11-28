@@ -1,25 +1,28 @@
 # MCP Server
 
 ## Purpose
-This MCP Server provides tools to communicate with an instance of a service dependency API.
+This MCP Server provides tools to communicate with an instance of a service atlas API.
 
-## Tools Available
-### Hello World
-Provides a basic hello world example to understand how to use the mcp server.
+## Resource Specification
+The resources use a custom http-esque resource specification in the format of `servicemap://` so that requests from the client 
+are directed only to the service atlas mcp.
+
+## Use Cases
+Each use case is implemented with a prompt, a tool, and a resource
+### List All Services that belong to a Team
+This use case lists all services that belong to a team. It calls the `/teams/{teamId}/services` endpoint of the service atlas api.`
 
 
-## Prompts
-### Hello World
-Points a user to use the hello world tool.
 
 ## Testing
 
 To test the mcp server locally, use the `ModelContextProtocolInspector`.
-This tool requires node and can be run with the following command from the root of the project:
+This tool requires `node` and can be run with the following command from the root of the project:
 
 ```bash
 npx @modelcontextprotocol/inspector
 ```
+The command to start this mcp server is `uv run` with arguments `src/mcp_server.py`.
 
 Once the mcp inspector is running, navigate to the localhost url that is displayed in the terminal.
 You will need to input the run command as `go run` and the optional arguments as `./mcp/cmd/service-dependency-mcp`.
