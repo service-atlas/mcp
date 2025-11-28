@@ -26,7 +26,7 @@ def prompt_get_services_by_team(team_id: str) -> str:
     """
 
 @mcp.tool()
-def get_services_by_team(team_id:str):
+def get_services_by_team(team_id: str):
     """
     Tool that returns a list of services for a team based on id
     :param team_id: guid for the team
@@ -35,7 +35,7 @@ def get_services_by_team(team_id:str):
     return _fetch_services_by_team(team_id, api_url)
 
 @mcp.resource('servicemap://teams/{team_id}/services')
-def get_services_by_team_resource(team_id:str):
+def get_services_by_team_resource(team_id: str):
     """
     Resource that returns a list of services for a team based on id
     :param team_id: guid for the team
