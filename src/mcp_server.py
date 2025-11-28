@@ -59,7 +59,7 @@ def main():
     except KeyboardInterrupt:
         log("Server shutdown requested by user")
     except Exception as e:
-        log(f"Failed to start Stock MCP Server: {e}")
+        log(f"Failed to start MCP Server: {e}")
         sys.exit(1)
 
 
