@@ -20,7 +20,7 @@ def prompt_get_services_by_team(team_id: str) -> str:
     :return:
     """
     return f"""
-        To get a list of services for a team, use the resource Use the resource: servicemap://teams/{team_id}/services` 
+        To get a list of services for a team, use the resource: servicemap://teams/{team_id}/services` 
         or the `get_services_by_team` tool, passing in a required 'teamId' parameter. It will return a list of services. 
         If you haven't previously called the 'get_teams' tool, you will need to do so you can get team Ids based on team names. This call expects a guid id passed in
     """
