@@ -1,7 +1,6 @@
 import requests
 
 
-
 def _fetch_services_by_team(api_url: str, team_id: str) -> list:
     """
     Calls the service atlas api to get services for a team
@@ -13,15 +12,26 @@ def _fetch_services_by_team(api_url: str, team_id: str) -> list:
     response.raise_for_status()
     return response.json()
 
+
 def _fetch_all_teams(api_url: str) -> list:
     """
     Returns all teams from the service atlas api
     :param api_url: the url base for the service atlas api
     :return:
     """
-    response = requests.get(f"{api_url}/teams", params={"page": 1, "pageSize": 20}, timeout=10)
-    response.raise_for_status()
-    return response.json()
+    max_iterations = 10
+    iteration = 0
+    all_teams = []
+    while iteration < max_iterations:
+        iteration += 1
+        response = requests.get(f"{api_url}/teams", params={"page": iteration, "pageSize": 20}, timeout=10)
+        response.raise_for_status()
+        teams = response.json()
+        if not teams:
+            break
+        all_teams.extend(teams)
+    return all_teams
+
 
 def _search_service_by_name(api_url: str, query: str) -> list:
     """
@@ -30,9 +40,10 @@ def _search_service_by_name(api_url: str, query: str) -> list:
     :param query: the name of the service to search on
     :return: a list of service objects
     """
-    response = requests.get(f"{api_url}/services/search", params={"query":query}, timeout=10)
+    response = requests.get(f"{api_url}/services/search", params={"query": query}, timeout=10)
     response.raise_for_status()
     return response.json()
+
 
 def _fetch_teams_by_service_id(api_url: str, service_id: str) -> list:
     """
