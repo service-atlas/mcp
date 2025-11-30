@@ -11,10 +11,12 @@ api_url = ""
 
 mcp = FastMCP("Service Map MCP")
 
+
 def log(message: str):
     """Log a message to stderr to avoid interfering with STDIO transport."""
     sys.stderr.write(f"{message}\n")
     sys.stderr.flush()
+
 
 @mcp.prompt('get_services_by_team')
 def prompt_get_services_by_team(team_id: str) -> str:
@@ -29,6 +31,7 @@ def prompt_get_services_by_team(team_id: str) -> str:
         If you haven't previously called the 'get_teams' tool, you will need to do so you can get team Ids based on team names. This call expects a guid id passed in
     """
 
+
 @mcp.prompt('find_service_by_name')
 def prompt_get_service_by_name(query: str) -> str:
     """
@@ -39,6 +42,7 @@ def prompt_get_service_by_name(query: str) -> str:
         To search for a service by name, use the tool `find_service_by_name`, passing in a required 'query' parameter, or 
         the resource `serviceatlas://services/search/{query}` with a query parameter.
     """
+
 
 @mcp.prompt('find_which_team_owns_a_service')
 def prompt_find_which_team_owns_a_service() -> str:
@@ -53,13 +57,14 @@ def prompt_find_which_team_owns_a_service() -> str:
         The `serviceatlas://services/{service_id}/teams` resource is synonymous with the `get_teams_by_service` tool.
         """
 
+
 @mcp.prompt('get_all_teams')
 def prompt_get_all_teams() -> str:
-
     return """
         To get a list of all teams, use the tool `get_all_teams` or the resource `serviceatlas://teams`. The returned data will be an array of teams, which contains 
         an `id` field and a `name` field. The `id` field is the guid for the team, which will be used to make further calls.
     """
+
 
 @mcp.tool()
 def find_service_by_name(query: str):
@@ -70,6 +75,7 @@ def find_service_by_name(query: str):
     """
     return _search_service_by_name(api_url, query)
 
+
 @mcp.resource('serviceatlas://services/search/{query}')
 def find_service_by_name_resource(query: str):
     """
@@ -78,6 +84,7 @@ def find_service_by_name_resource(query: str):
     :return: a list of services objects
     """
     return _search_service_by_name(api_url, query)
+
 
 @mcp.tool()
 def get_teams_by_service(service_id: str):
@@ -88,6 +95,7 @@ def get_teams_by_service(service_id: str):
     """
     return _fetch_teams_by_service_id(api_url, service_id)
 
+
 @mcp.resource('serviceatlas://services/{service_id}/teams')
 def get_teams_by_service_resource(service_id: str):
     """
@@ -96,6 +104,7 @@ def get_teams_by_service_resource(service_id: str):
     :return: a list of teams objects
     """
     return _fetch_teams_by_service_id(api_url, service_id)
+
 
 @mcp.tool()
 def get_services_by_team(team_id: str):
@@ -106,6 +115,7 @@ def get_services_by_team(team_id: str):
     """
     return _fetch_services_by_team(api_url, team_id)
 
+
 @mcp.resource('serviceatlas://teams/{team_id}/services')
 def get_services_by_team_resource(team_id: str):
     """
@@ -114,6 +124,7 @@ def get_services_by_team_resource(team_id: str):
     :return: array of services objects from the api
     """
     return _fetch_services_by_team(api_url, team_id)
+
 
 @mcp.tool()
 def get_all_teams():
@@ -132,6 +143,7 @@ def get_all_teams_resource():
     """
     return _fetch_all_teams(api_url)
 
+
 def main():
     """
     Main entry point for mcp service
@@ -142,7 +154,7 @@ def main():
         api_url = os.getenv("API_URL")
         if not api_url:
             api_url = "http://localhost:8080"
-            #raise ValueError("API_URL environment variable is required.")
+            # raise ValueError("API_URL environment variable is required.")
         # Run the FastMCP server with STDIO transport
         mcp.run()
     except KeyboardInterrupt:
