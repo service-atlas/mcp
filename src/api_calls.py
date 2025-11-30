@@ -19,7 +19,7 @@ def _fetch_all_teams(api_url: str) -> list:
     :param api_url: the url base for the service atlas api
     :return:
     """
-    response = requests.get(f"{api_url}/teams", timeout=10)
+    response = requests.get(f"{api_url}/teams", params={"page": 1, "pageSize": 20}, timeout=10)
     response.raise_for_status()
     return response.json()
 
