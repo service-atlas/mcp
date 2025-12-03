@@ -67,9 +67,8 @@ def get_services_by_team_resource(team_id: str):
 
 def _fetch_all_teams() -> list:
     """
-    Returns all teams from the service atlas api
-    :param api_url: the url base for the service atlas api
-    :return:
+    Returns all teams from the service atlas api.
+    :return: list of teams objects (max of 200 due to pagination limit)
     """
     max_iterations = 10
     iteration = 0
