@@ -1,3 +1,5 @@
+import asyncio
+
 from fastmcp import FastMCP
 import os
 import sys
@@ -6,6 +8,8 @@ from api_calls import (
     _search_service_by_name,
     _fetch_teams_by_service_id,
     _fetch_all_teams)
+
+from debt import debt_mcp
 
 api_url = ""
 
@@ -64,6 +68,7 @@ def prompt_get_all_teams() -> str:
         To get a list of all teams, use the tool `get_all_teams` or the resource `serviceatlas://teams`. The returned data will be an array of teams, which contains 
         an `id` field and a `name` field. The `id` field is the guid for the team, which will be used to make further calls.
     """
+
 
 
 @mcp.tool()
@@ -144,6 +149,10 @@ def get_all_teams_resource():
     return _fetch_all_teams(api_url)
 
 
+async def setup():
+    await mcp.import_server(debt_mcp)
+
+
 def main():
     """
     Main entry point for mcp service
@@ -155,6 +164,7 @@ def main():
         if not api_url:
             api_url = "http://localhost:8080"
             # raise ValueError("API_URL environment variable is required.")
+        asyncio.run(setup())
         # Run the FastMCP server with STDIO transport
         mcp.run()
     except KeyboardInterrupt:

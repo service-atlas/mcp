@@ -40,4 +40,4 @@ Then you can run the `Sample Service Map` folder in the Bruno collection. This w
 ## References
 - [BruceTraining MCP Example](https://github.com/BruceTraining/MCP-Oreilly-2)
 - [MCP Resources](https://modelcontextprotocol.io/specification/2025-06-18/server/resources)
-- [Go MCP SDK Example](https://github.com/modelcontextprotocol/go-sdk/blob/main/examples/server/everything/main.go)
+- [FastMCP Docs](https://gofastmcp.com/getting-started/welcome)
