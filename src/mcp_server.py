@@ -8,8 +8,6 @@ from debt import debt_mcp
 from services import service_mcp
 from teams import teams_mcp
 
-api_url = ""
-
 mcp = FastMCP("Service Map MCP")
 
 
@@ -31,11 +29,6 @@ def main():
     :return:
     """
     try:
-        global api_url
-        api_url = os.getenv("API_URL")
-        if not api_url:
-            api_url = "http://localhost:8080"
-            # raise ValueError("API_URL environment variable is required.")
         asyncio.run(setup())
         # Run the FastMCP server with STDIO transport
         mcp.run()
