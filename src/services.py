@@ -13,7 +13,7 @@ def prompt_get_services_by_team(team_id: str) -> str:
     :return:
     """
     return f"""
-        To get a list of services for a team, use the resource: serviceatlas://teams/{team_id}/services` 
+        To get a list of services for a team, use the resource: `serviceatlas://teams/{team_id}/services` 
         or the `get_services_by_team` tool, passing in a required 'teamId' parameter. It will return a list of services. 
         If you haven't previously called the 'get_teams' tool, you will need to do so you can get team Ids based on team names. This call expects a guid id passed in
     """
@@ -38,7 +38,7 @@ def find_service_by_name(query: str):
     :param query: the name to search against
     :return: a list of services objects
     """
-    return api_caller.call_get(f'/services/search', params={"query": query})
+    return api_caller.call_get('/services/search', params={"query": query})
 
 
 @service_mcp.resource('serviceatlas://services/search/{query}')
@@ -48,7 +48,7 @@ def find_service_by_name_resource(query: str):
     :param query: the name to search against
     :return: a list of services objects
     """
-    return api_caller.call_get(f'/services/search', params={"query": query})
+    return api_caller.call_get('/services/search', params={"query": query})
 
 
 @service_mcp.tool()
