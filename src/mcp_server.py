@@ -1,5 +1,4 @@
 import asyncio
-import os
 import sys
 
 from fastmcp import FastMCP
@@ -7,6 +6,7 @@ from fastmcp import FastMCP
 from debt import debt_mcp
 from services import service_mcp
 from teams import teams_mcp
+from releases import release_mcp
 
 mcp = FastMCP("Service Map MCP")
 
@@ -21,6 +21,7 @@ async def setup():
     await mcp.import_server(debt_mcp)
     await mcp.import_server(teams_mcp)
     await mcp.import_server(service_mcp)
+    await mcp.import_server(release_mcp)
 
 
 def main():
