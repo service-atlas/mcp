@@ -8,7 +8,7 @@ from services import service_mcp
 from teams import teams_mcp
 from releases import release_mcp
 
-mcp = FastMCP("Service Map MCP")
+mcp = FastMCP("Service Atlas MCP")
 
 
 def log(message: str):
