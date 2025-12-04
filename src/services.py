@@ -31,7 +31,7 @@ def prompt_get_service_by_name(query: str) -> str:
     """
 
 
-@service_mcp.tool()
+@service_mcp.tool(annotations={"readOnlyHint": True, "title": "Find Service by Name"})
 def find_service_by_name(query: str):
     """
     Search for a service by name
@@ -41,7 +41,7 @@ def find_service_by_name(query: str):
     return api_caller.call_get('/services/search', params={"query": query})
 
 
-@service_mcp.resource('serviceatlas://services/search/{query}')
+@service_mcp.resource(uri='serviceatlas://services/search/{query}', name='Search Services by Name', mime_type='application/json')
 def find_service_by_name_resource(query: str):
     """
     Search for a service by name
@@ -51,7 +51,7 @@ def find_service_by_name_resource(query: str):
     return api_caller.call_get('/services/search', params={"query": query})
 
 
-@service_mcp.tool()
+@service_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Teams for Service"})
 def get_teams_by_service(service_id: str):
     """
     Gets a list of teams that own a service based on id
@@ -61,7 +61,7 @@ def get_teams_by_service(service_id: str):
     return api_caller.call_get(f'/services/{service_id}/teams')
 
 
-@service_mcp.resource('serviceatlas://services/{service_id}/teams')
+@service_mcp.resource(uri='serviceatlas://services/{service_id}/teams', name='Teams by Service', mime_type='application/json')
 def get_teams_by_service_resource(service_id: str):
     """
     Gets a list of teams that own a service based on id

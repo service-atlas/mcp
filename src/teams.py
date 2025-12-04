@@ -27,7 +27,7 @@ def prompt_get_all_teams() -> str:
     """
 
 
-@teams_mcp.tool()
+@teams_mcp.tool(annotations={"readOnlyHint": True, "title": "Get All Teams"})
 def get_all_teams():
     """
     Returns all teams from the service atlas api
@@ -36,7 +36,7 @@ def get_all_teams():
     return _fetch_all_teams()
 
 
-@teams_mcp.resource('serviceatlas://teams')
+@teams_mcp.resource(uri='serviceatlas://teams', name='All Teams', mime_type='application/json')
 def get_all_teams_resource():
     """
     Returns all teams from the service atlas api
@@ -45,7 +45,7 @@ def get_all_teams_resource():
     return _fetch_all_teams()
 
 
-@teams_mcp.tool()
+@teams_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Services for Team"})
 def get_services_by_team(team_id: str):
     """
     Tool that returns a list of services for a team based on id
@@ -55,7 +55,7 @@ def get_services_by_team(team_id: str):
     return api_caller.call_get(f'/teams/{team_id}/services')
 
 
-@teams_mcp.resource('serviceatlas://teams/{team_id}/services')
+@teams_mcp.resource(uri='serviceatlas://teams/{team_id}/services', name='Services by Team', mime_type='application/json')
 def get_services_by_team_resource(team_id: str):
     """
     Resource that returns a list of services for a team based on id

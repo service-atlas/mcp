@@ -14,7 +14,7 @@ def prompt_get_debt() -> str:
     """
 
 
-@debt_mcp.tool()
+@debt_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Debt Report"})
 def get_debt():
     """
     Gets a report of all services that have open debts and a count of the number of debts associated with them
@@ -23,7 +23,7 @@ def get_debt():
     return api_caller.call_get('/reports/services/debt')
 
 
-@debt_mcp.resource(uri='serviceatlas://debts', name='Get Debt Report', mime_type='application/json')
+@debt_mcp.resource(uri='serviceatlas://debts', name='Debt Report', mime_type='application/json')
 def get_debts_resource():
     """
     Gets a report of all services that have open debts and a count of the number of debts associated with them
@@ -32,7 +32,7 @@ def get_debts_resource():
     return api_caller.call_get('/reports/services/debt')
 
 
-@debt_mcp.tool()
+@debt_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Debts for Service"})
 def get_debts_for_service(service_id: str):
     """
     Gets the debts for a specific service
@@ -42,7 +42,7 @@ def get_debts_for_service(service_id: str):
     return api_caller.call_get(f'/services/{service_id}/debt')
 
 
-@debt_mcp.resource('serviceatlas://debts/{service_id}')
+@debt_mcp.resource(uri='serviceatlas://debts/{service_id}', name='Debts by Service', mime_type='application/json')
 def get_debts_for_service_resource(service_id: str):
     """
     Gets the debts for a specific service
