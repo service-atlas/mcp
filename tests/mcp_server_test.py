@@ -44,6 +44,7 @@ async def test_setup_imports_servers_in_order(monkeypatch: pytest.MonkeyPatch):
         mcp_server.teams_mcp,
         mcp_server.service_mcp,
         mcp_server.release_mcp,
+        mcp_server.dependency_mcp,
     ]
 
 
