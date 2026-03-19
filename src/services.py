@@ -31,6 +31,19 @@ def prompt_get_service_by_name(query: str) -> str:
     """
 
 
+@service_mcp.prompt('get_service_risk')
+def prompt_get_service_risk(service_id: str) -> str:
+    """
+    Prompt for telling the AI how to get a service's risk report
+    :param service_id:
+    :return:
+    """
+    return f"""
+        To get the risk report for a service, use the tool `get_service_risk` or the resource `serviceatlas://services/{service_id}/risk`. 
+        The report includes change risk (heuristic signal for cascading impact) and health risk (debt and dependent counts).
+    """
+
+
 @service_mcp.tool(annotations={"readOnlyHint": True, "title": "Find Service by Name"})
 def find_service_by_name(query: str):
     """
@@ -69,3 +82,23 @@ def get_teams_by_service_resource(service_id: str):
     :return: a list of teams objects
     """
     return api_caller.call_get(f'/services/{service_id}/teams')
+
+
+@service_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Service Risk Report"})
+def get_service_risk(service_id: str):
+    """
+    Gets the risk report for a specific service
+    :param service_id: the guid for the service
+    :return: risk report object
+    """
+    return api_caller.call_get(f'/reports/services/{service_id}/risk')
+
+
+@service_mcp.resource(uri='serviceatlas://services/{service_id}/risk', name='Service Risk Report', mime_type='application/json')
+def get_service_risk_resource(service_id: str):
+    """
+    Gets the risk report for a specific service
+    :param service_id: the guid for the service
+    :return: risk report object
+    """
+    return api_caller.call_get(f'/reports/services/{service_id}/risk')

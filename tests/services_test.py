@@ -104,3 +104,39 @@ def test_get_teams_by_service_resource_calls_api_and_returns_data(
 
     assert result == fake_response
     assert dummy.calls == [("/services/svc-xyz/teams", None)]
+
+
+def test_prompt_get_service_risk_mentions_tool_and_resource():
+    services = load_services_module()
+    prompt = services.prompt_get_service_risk.fn("svc-123")
+    assert "get_service_risk" in prompt
+    assert "serviceatlas://services/svc-123/risk" in prompt
+
+
+def test_get_service_risk_tool_calls_api_and_returns_data(monkeypatch: pytest.MonkeyPatch):
+    services = load_services_module()
+    fake_response = {
+        "changeRisk": {"risk": "medium", "score": 60},
+        "healthRisk": {"debtCount": {"code": 1, "documentation": 1}, "dependentCount": 1},
+    }
+    dummy = DummyApiCaller(fake_response)
+    monkeypatch.setattr(services, "api_caller", dummy, raising=True)
+
+    result = services.get_service_risk.fn("svc-123")
+
+    assert result == fake_response
+    assert dummy.calls == [("/reports/services/svc-123/risk", None)]
+
+
+def test_get_service_risk_resource_calls_api_and_returns_data(monkeypatch: pytest.MonkeyPatch):
+    services = load_services_module()
+    fake_response = {
+        "changeRisk": {"risk": "low", "score": 20},
+    }
+    dummy = DummyApiCaller(fake_response)
+    monkeypatch.setattr(services, "api_caller", dummy, raising=True)
+
+    result = services.get_service_risk_resource.fn("svc-456")
+
+    assert result == fake_response
+    assert dummy.calls == [("/reports/services/svc-456/risk", None)]
