@@ -98,3 +98,15 @@ def test_main_logs_error_and_exits_with_code_1(monkeypatch: pytest.MonkeyPatch, 
     assert exc.value.code == 1
     err = capsys.readouterr().err
     assert "Failed to start MCP Server: boom" in err
+
+
+def test_analyze_service_risk_and_impact_prompt_exists():
+    mcp_server = load_mcp_server_module()
+    prompt_text = mcp_server.analyze_service_risk_and_impact.fn()
+    assert "You are an AI assistant embedded in Service Atlas" in prompt_text
+    assert "## Your tools" in prompt_text
+    assert "find_service_by_name" in prompt_text
+    assert "get_service_dependents" in prompt_text
+    assert "get_service_dependencies" in prompt_text
+    assert "get_teams_by_service" in prompt_text
+    assert "get_debts_for_service" in prompt_text
