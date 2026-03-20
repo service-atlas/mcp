@@ -100,9 +100,15 @@ def test_main_logs_error_and_exits_with_code_1(monkeypatch: pytest.MonkeyPatch, 
     assert "Failed to start MCP Server: boom" in err
 
 
+def call_fn(func_or_tool, *args, **kwargs):
+    if hasattr(func_or_tool, "fn"):
+        return func_or_tool.fn(*args, **kwargs)
+    return func_or_tool(*args, **kwargs)
+
+
 def test_analyze_service_risk_and_impact_prompt_exists():
     mcp_server = load_mcp_server_module()
-    prompt_text = mcp_server.analyze_service_risk_and_impact.fn()
+    prompt_text = call_fn(mcp_server.analyze_service_risk_and_impact)
     assert "You are an AI assistant embedded in Service Atlas" in prompt_text
     assert "## Your tools" in prompt_text
     assert "find_service_by_name" in prompt_text

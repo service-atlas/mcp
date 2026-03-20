@@ -29,16 +29,22 @@ class DummyApiCaller:
         return self.response
 
 
+def call_fn(func_or_tool, *args, **kwargs):
+    if hasattr(func_or_tool, "fn"):
+        return func_or_tool.fn(*args, **kwargs)
+    return func_or_tool(*args, **kwargs)
+
+
 def test_prompt_get_services_by_team_mentions_tool_and_resource():
     services = load_services_module()
-    prompt = services.prompt_get_services_by_team.fn("team-123")
+    prompt = call_fn(services.prompt_get_services_by_team, "team-123")
     assert "get_services_by_team" in prompt
     assert "serviceatlas://teams/team-123/services" in prompt
 
 
 def test_prompt_find_service_by_name_mentions_tool_and_resource():
     services = load_services_module()
-    prompt = services.prompt_get_service_by_name.fn("orders")
+    prompt = call_fn(services.prompt_get_service_by_name, "orders")
     assert "find_service_by_name" in prompt
     assert "serviceatlas://services/search/orders" in prompt
 
@@ -53,7 +59,7 @@ def test_find_service_by_name_tool_calls_api_with_params_and_returns_data(
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(services, "api_caller", dummy, raising=True)
 
-    result = services.find_service_by_name.fn("orders")
+    result = call_fn(services.find_service_by_name, "orders")
 
     assert result == fake_response
     assert dummy.calls == [("/services/search", {"query": "orders"})]
@@ -69,7 +75,7 @@ def test_find_service_by_name_resource_calls_api_with_params_and_returns_data(
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(services, "api_caller", dummy, raising=True)
 
-    result = services.find_service_by_name_resource.fn("billing")
+    result = call_fn(services.find_service_by_name_resource, "billing")
 
     assert result == fake_response
     assert dummy.calls == [("/services/search", {"query": "billing"})]
@@ -84,7 +90,7 @@ def test_get_teams_by_service_tool_calls_api_and_returns_data(monkeypatch: pytes
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(services, "api_caller", dummy, raising=True)
 
-    result = services.get_teams_by_service.fn("svc-123")
+    result = call_fn(services.get_teams_by_service, "svc-123")
 
     assert result == fake_response
     assert dummy.calls == [("/services/svc-123/teams", None)]
@@ -100,7 +106,7 @@ def test_get_teams_by_service_resource_calls_api_and_returns_data(
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(services, "api_caller", dummy, raising=True)
 
-    result = services.get_teams_by_service_resource.fn("svc-xyz")
+    result = call_fn(services.get_teams_by_service_resource, "svc-xyz")
 
     assert result == fake_response
     assert dummy.calls == [("/services/svc-xyz/teams", None)]
@@ -108,7 +114,7 @@ def test_get_teams_by_service_resource_calls_api_and_returns_data(
 
 def test_prompt_get_service_risk_mentions_tool_and_resource():
     services = load_services_module()
-    prompt = services.prompt_get_service_risk.fn("svc-123")
+    prompt = call_fn(services.prompt_get_service_risk, "svc-123")
     assert "get_service_risk" in prompt
     assert "serviceatlas://services/svc-123/risk" in prompt
 
@@ -122,7 +128,7 @@ def test_get_service_risk_tool_calls_api_and_returns_data(monkeypatch: pytest.Mo
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(services, "api_caller", dummy, raising=True)
 
-    result = services.get_service_risk.fn("svc-123")
+    result = call_fn(services.get_service_risk, "svc-123")
 
     assert result == fake_response
     assert dummy.calls == [("/reports/services/svc-123/risk", None)]
@@ -136,7 +142,7 @@ def test_get_service_risk_resource_calls_api_and_returns_data(monkeypatch: pytes
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(services, "api_caller", dummy, raising=True)
 
-    result = services.get_service_risk_resource.fn("svc-456")
+    result = call_fn(services.get_service_risk_resource, "svc-456")
 
     assert result == fake_response
     assert dummy.calls == [("/reports/services/svc-456/risk", None)]

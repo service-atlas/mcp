@@ -29,9 +29,15 @@ class DummyApiCaller:
         return self.response
 
 
+def call_fn(func_or_tool, *args, **kwargs):
+    if hasattr(func_or_tool, "fn"):
+        return func_or_tool.fn(*args, **kwargs)
+    return func_or_tool(*args, **kwargs)
+
+
 def test_prompt_get_debt_mentions_tools_and_resources():
     debt = load_debt_module()
-    prompt = debt.prompt_get_debt.fn()
+    prompt = call_fn(debt.prompt_get_debt)
     assert "get_debt" in prompt
     assert "serviceatlas://debts" in prompt
     assert "get_debts_for_service" in prompt
@@ -47,7 +53,7 @@ def test_get_debt_tool_calls_api_and_returns_data(monkeypatch: pytest.MonkeyPatc
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(debt, "api_caller", dummy, raising=True)
 
-    result = debt.get_debt.fn()
+    result = call_fn(debt.get_debt)
 
     assert result == fake_response
     assert dummy.calls == [("/reports/services/debt", None)]
@@ -61,7 +67,7 @@ def test_get_debts_resource_calls_api_and_returns_data(monkeypatch: pytest.Monke
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(debt, "api_caller", dummy, raising=True)
 
-    result = debt.get_debts_resource.fn()
+    result = call_fn(debt.get_debts_resource)
 
     assert result == fake_response
     assert dummy.calls == [("/reports/services/debt", None)]
@@ -75,7 +81,7 @@ def test_get_debts_for_service_tool_calls_api_and_returns_data(monkeypatch: pyte
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(debt, "api_caller", dummy, raising=True)
 
-    result = debt.get_debts_for_service.fn("svc-123")
+    result = call_fn(debt.get_debts_for_service, "svc-123")
 
     assert result == fake_response
     assert dummy.calls == [("/services/svc-123/debt", None)]
@@ -89,7 +95,7 @@ def test_get_debts_for_service_resource_calls_api_and_returns_data(monkeypatch: 
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(debt, "api_caller", dummy, raising=True)
 
-    result = debt.get_debts_for_service_resource.fn("svc-xyz")
+    result = call_fn(debt.get_debts_for_service_resource, "svc-xyz")
 
     assert result == fake_response
     assert dummy.calls == [("/services/svc-xyz/debt", None)]

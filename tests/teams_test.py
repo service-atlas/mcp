@@ -42,9 +42,15 @@ class PagingDummyApiCaller:
         return []
 
 
+def call_fn(func_or_tool, *args, **kwargs):
+    if hasattr(func_or_tool, "fn"):
+        return func_or_tool.fn(*args, **kwargs)
+    return func_or_tool(*args, **kwargs)
+
+
 def test_prompt_find_which_team_owns_a_service_mentions_tools_and_resources():
     teams = load_teams_module()
-    prompt = teams.prompt_find_which_team_owns_a_service.fn()
+    prompt = call_fn(teams.prompt_find_which_team_owns_a_service)
     assert "find_service_by_name" in prompt
     assert "get_teams_by_service" in prompt
     assert "serviceatlas://services/search/{query}" in prompt
@@ -53,7 +59,7 @@ def test_prompt_find_which_team_owns_a_service_mentions_tools_and_resources():
 
 def test_prompt_get_all_teams_mentions_tool_and_resource():
     teams = load_teams_module()
-    prompt = teams.prompt_get_all_teams.fn()
+    prompt = call_fn(teams.prompt_get_all_teams)
     assert "get_all_teams" in prompt
     assert "serviceatlas://teams" in prompt
     assert "id" in prompt and "name" in prompt
@@ -69,7 +75,7 @@ def test_get_all_teams_tool_paginates_and_aggregates(monkeypatch: pytest.MonkeyP
     dummy = PagingDummyApiCaller(pages)
     monkeypatch.setattr(teams, "api_caller", dummy, raising=True)
 
-    result = teams.get_all_teams.fn()
+    result = call_fn(teams.get_all_teams)
 
     assert result == pages[1] + pages[2]
     # Expect three calls: pages 1, 2, then 3 (empty -> stop)
@@ -89,7 +95,7 @@ def test_get_all_teams_resource_paginates_and_aggregates(monkeypatch: pytest.Mon
     dummy = PagingDummyApiCaller(pages)
     monkeypatch.setattr(teams, "api_caller", dummy, raising=True)
 
-    result = teams.get_all_teams_resource.fn()
+    result = call_fn(teams.get_all_teams_resource)
 
     assert result == pages[1] + pages[2]
     assert dummy.calls == [
@@ -108,7 +114,7 @@ def test_get_services_by_team_tool_calls_api_and_returns_data(monkeypatch: pytes
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(teams, "api_caller", dummy, raising=True)
 
-    result = teams.get_services_by_team.fn("team-123")
+    result = call_fn(teams.get_services_by_team, "team-123")
 
     assert result == fake_response
     assert dummy.calls == [("/teams/team-123/services", None)]
@@ -122,7 +128,7 @@ def test_get_services_by_team_resource_calls_api_and_returns_data(monkeypatch: p
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(teams, "api_caller", dummy, raising=True)
 
-    result = teams.get_services_by_team_resource.fn("my-team")
+    result = call_fn(teams.get_services_by_team_resource, "my-team")
 
     assert result == fake_response
     assert dummy.calls == [("/teams/my-team/services", None)]

@@ -29,9 +29,15 @@ class DummyApiCaller:
         return self.response
 
 
+def call_fn(func_or_tool, *args, **kwargs):
+    if hasattr(func_or_tool, "fn"):
+        return func_or_tool.fn(*args, **kwargs)
+    return func_or_tool(*args, **kwargs)
+
+
 def test_prompt_get_service_dependencies_and_dependents_mentions_tools_and_resources():
     dependency = load_dependency_module()
-    prompt = dependency.prompt_get_service_dependencies_and_dependents.fn("svc-123")
+    prompt = call_fn(dependency.prompt_get_service_dependencies_and_dependents, "svc-123")
     assert "get_service_dependencies" in prompt
     assert "get_service_dependents" in prompt
     assert "serviceatlas://services/svc-123/dependencies" in prompt
@@ -46,7 +52,7 @@ def test_get_service_dependencies_tool_calls_api_and_returns_data(monkeypatch: p
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(dependency, "api_caller", dummy, raising=True)
 
-    result = dependency.get_service_dependencies.fn("svc-123")
+    result = call_fn(dependency.get_service_dependencies, "svc-123")
 
     assert result == fake_response
     assert dummy.calls == [("/services/svc-123/dependencies", None)]
@@ -60,7 +66,7 @@ def test_get_service_dependencies_resource_calls_api_and_returns_data(monkeypatc
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(dependency, "api_caller", dummy, raising=True)
 
-    result = dependency.get_service_dependencies_resource.fn("svc-456")
+    result = call_fn(dependency.get_service_dependencies_resource, "svc-456")
 
     assert result == fake_response
     assert dummy.calls == [("/services/svc-456/dependencies", None)]
@@ -74,7 +80,7 @@ def test_get_service_dependents_tool_calls_api_and_returns_data(monkeypatch: pyt
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(dependency, "api_caller", dummy, raising=True)
 
-    result = dependency.get_service_dependents.fn("svc-123")
+    result = call_fn(dependency.get_service_dependents, "svc-123")
 
     assert result == fake_response
     assert dummy.calls == [("/services/svc-123/dependents", None)]
@@ -88,7 +94,7 @@ def test_get_service_dependents_resource_calls_api_and_returns_data(monkeypatch:
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(dependency, "api_caller", dummy, raising=True)
 
-    result = dependency.get_service_dependents_resource.fn("svc-456")
+    result = call_fn(dependency.get_service_dependents_resource, "svc-456")
 
     assert result == fake_response
     assert dummy.calls == [("/services/svc-456/dependents", None)]
