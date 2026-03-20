@@ -29,9 +29,15 @@ class DummyApiCaller:
         return self.response
 
 
+def call_fn(func_or_tool, *args, **kwargs):
+    if hasattr(func_or_tool, "fn"):
+        return func_or_tool.fn(*args, **kwargs)
+    return func_or_tool(*args, **kwargs)
+
+
 def test_prompt_get_releases():
     releases = load_releases_module()
-    prompt = releases.prompt_get_releases.fn("2024-01-01", "2024-01-31")
+    prompt = call_fn(releases.prompt_get_releases, "2024-01-01", "2024-01-31")
     # Check that the prompt references both the tool and the resource URI with provided dates
     assert "get_releases" in prompt
     assert "serviceatlas://releases/2024-01-01/2024-01-31" in prompt
@@ -47,7 +53,7 @@ def test_get_releases_tool_calls_api_and_returns_data(monkeypatch: pytest.Monkey
     # Patch the module-level api_caller used inside releases.get_releases
     monkeypatch.setattr(releases, "api_caller", dummy, raising=True)
 
-    result = releases.get_releases.fn("2024-01-01", "2024-01-31")
+    result = call_fn(releases.get_releases, "2024-01-01", "2024-01-31")
 
     assert result == fake_response
     # Verify proper URL formation with leading slash
@@ -63,7 +69,7 @@ def test_get_releases_resource_calls_api_and_returns_data(monkeypatch: pytest.Mo
     # Patch the module-level api_caller used inside releases.get_releases_resource
     monkeypatch.setattr(releases, "api_caller", dummy, raising=True)
 
-    result = releases.get_releases_resource.fn("2024-02-01", "2024-02-29")
+    result = call_fn(releases.get_releases_resource, "2024-02-01", "2024-02-29")
 
     assert result == fake_response
     assert dummy.calls == [("/releases/2024-02-01/2024-02-29", None)]

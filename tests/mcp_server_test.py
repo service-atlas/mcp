@@ -44,6 +44,7 @@ async def test_setup_imports_servers_in_order(monkeypatch: pytest.MonkeyPatch):
         mcp_server.teams_mcp,
         mcp_server.service_mcp,
         mcp_server.release_mcp,
+        mcp_server.dependency_mcp,
     ]
 
 
@@ -97,3 +98,21 @@ def test_main_logs_error_and_exits_with_code_1(monkeypatch: pytest.MonkeyPatch, 
     assert exc.value.code == 1
     err = capsys.readouterr().err
     assert "Failed to start MCP Server: boom" in err
+
+
+def call_fn(func_or_tool, *args, **kwargs):
+    if hasattr(func_or_tool, "fn"):
+        return func_or_tool.fn(*args, **kwargs)
+    return func_or_tool(*args, **kwargs)
+
+
+def test_analyze_service_risk_and_impact_prompt_exists():
+    mcp_server = load_mcp_server_module()
+    prompt_text = call_fn(mcp_server.analyze_service_risk_and_impact)
+    assert "You are an AI assistant embedded in Service Atlas" in prompt_text
+    assert "## Your tools" in prompt_text
+    assert "find_service_by_name" in prompt_text
+    assert "get_service_dependents" in prompt_text
+    assert "get_service_dependencies" in prompt_text
+    assert "get_teams_by_service" in prompt_text
+    assert "get_debts_for_service" in prompt_text
