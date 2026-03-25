@@ -42,6 +42,16 @@ def create_dependency(service_id: str, dependency_id: str, version: str = None):
 
 
 
+@dependency_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Service Dependencies"})
+def get_service_dependencies(service_id: str):
+    """
+    Gets a list of services that this service depends on
+    :param service_id: the guid for the service
+    :return: a list of dependency objects
+    """
+    return api_caller.call_get(f'/services/{service_id}/dependencies')
+
+
 @dependency_mcp.resource(uri='serviceatlas://services/{service_id}/dependencies', name='Service Dependencies', mime_type='application/json')
 def get_service_dependencies_resource(service_id: str):
     """
@@ -52,6 +62,14 @@ def get_service_dependencies_resource(service_id: str):
     return api_caller.call_get(f'/services/{service_id}/dependencies')
 
 
+@dependency_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Service Dependents"})
+def get_service_dependents(service_id: str):
+    """
+    Gets a list of services that depend on this service
+    :param service_id: the guid for the service
+    :return: a list of dependent objects
+    """
+    return api_caller.call_get(f'/services/{service_id}/dependents')
 
 
 @dependency_mcp.resource(uri='serviceatlas://services/{service_id}/dependents', name='Service Dependents', mime_type='application/json')
@@ -62,4 +80,3 @@ def get_service_dependents_resource(service_id: str):
     :return: a list of dependent objects
     """
     return api_caller.call_get(f'/services/{service_id}/dependents')
-
