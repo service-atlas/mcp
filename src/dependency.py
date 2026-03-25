@@ -1,9 +1,10 @@
 from fastmcp import FastMCP
-
+from fastmcp.server.transforms import ResourcesAsTools
 from api_calls import api_caller
 
 dependency_mcp = FastMCP("Dependency MCP")
 
+dependency_mcp.add_transform(ResourcesAsTools(dependency_mcp))
 
 @dependency_mcp.prompt('get_service_dependencies_and_dependents')
 def prompt_get_service_dependencies_and_dependents(service_id: str) -> str:
@@ -21,14 +22,6 @@ def prompt_get_service_dependencies_and_dependents(service_id: str) -> str:
     """
 
 
-@dependency_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Service Dependencies"})
-def get_service_dependencies(service_id: str):
-    """
-    Gets a list of services that this service depends on
-    :param service_id: the guid for the service
-    :return: a list of dependency objects
-    """
-    return api_caller.call_get(f'/services/{service_id}/dependencies')
 
 
 @dependency_mcp.resource(uri='serviceatlas://services/{service_id}/dependencies', name='Service Dependencies', mime_type='application/json')
@@ -41,14 +34,6 @@ def get_service_dependencies_resource(service_id: str):
     return api_caller.call_get(f'/services/{service_id}/dependencies')
 
 
-@dependency_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Service Dependents"})
-def get_service_dependents(service_id: str):
-    """
-    Gets a list of services that depend on this service
-    :param service_id: the guid for the service
-    :return: a list of dependent objects
-    """
-    return api_caller.call_get(f'/services/{service_id}/dependents')
 
 
 @dependency_mcp.resource(uri='serviceatlas://services/{service_id}/dependents', name='Service Dependents', mime_type='application/json')
