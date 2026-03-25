@@ -14,12 +14,30 @@ def prompt_get_service_dependencies_and_dependents(service_id: str) -> str:
     :return:
     """
     return f"""
-        To get a list of dependencies for a service, use the resource: `serviceatlas://services/{service_id}/dependencies` 
-        or the `get_service_dependencies` tool, passing in a required 'service_id' parameter. It will return a list of dependencies. 
+        To get a list of dependencies for a service, use the resource: `serviceatlas://services/{service_id}/dependencies`. It will return a list of dependencies. 
         
-        To get a list of dependents for a service, use the resource: `serviceatlas://services/{service_id}/dependents` 
-        or the `get_service_dependents` tool, passing in a required 'service_id' parameter. It will return a list of dependents. 
+        To get a list of dependents for a service, use the resource: `serviceatlas://services/{service_id}/dependents`. It will return a list of dependents. 
+        
+        To create a dependency connection between two entities, use the tool: `create_dependency`, passing in the 'service_id' (service that depends), 'dependency_id' (service it depends on), and optionally 'version'.
     """
+
+
+
+
+@dependency_mcp.tool()
+def create_dependency(service_id: str, dependency_id: str, version: str = None):
+    """
+    Creates a dependency connection between two entities.
+    The service_id will depend on the dependency_id.
+    :param service_id: the guid for the service that will depend on the other service
+    :param dependency_id: the guid for the service that is being depended on
+    :param version: the version of the dependency
+    :return: json response
+    """
+    body = {"id": dependency_id}
+    if version:
+        body["version"] = version
+    return api_caller.call_post(f'/services/{service_id}/dependencies', body=body)
 
 
 
