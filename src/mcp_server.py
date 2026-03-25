@@ -18,12 +18,12 @@ def log(message: str):
     sys.stderr.flush()
 
 
-async def setup():
-    await mcp.import_server(debt_mcp)
-    await mcp.import_server(teams_mcp)
-    await mcp.import_server(service_mcp)
-    await mcp.import_server(release_mcp)
-    await mcp.import_server(dependency_mcp)
+def setup():
+    mcp.mount(debt_mcp)
+    mcp.mount(teams_mcp)
+    mcp.mount(service_mcp)
+    mcp.mount(release_mcp)
+    mcp.mount(dependency_mcp)
 
 
 @mcp.prompt("analyze_service_risk_and_impact")
@@ -111,7 +111,7 @@ def main():
     :return:
     """
     try:
-        asyncio.run(setup())
+        setup()
         # Run the FastMCP server with STDIO transport
         mcp.run()
     except KeyboardInterrupt:
