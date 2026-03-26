@@ -1,7 +1,7 @@
 # Service Atlas MCP Server
 
 ## Purpose
-This MCP server exposes read-only tools and resources for exploring a Service Atlas API: browsing teams, listing services for a team, searching services by name, seeing which teams own a service, and exploring service dependencies, tech debt, and releases.
+This MCP server exposes tools and resources for exploring a Service Atlas API: browsing teams, listing services for a team, searching services by name, seeing which teams own a service, and exploring service dependencies, tech debt, and releases.
 
 ## Capabilities
 - Prompts that guide the AI on how to complete common tasks using the tools/resources
@@ -15,7 +15,7 @@ This MCP server exposes read-only tools and resources for exploring a Service At
   - `get_service_risk`
   - `analyze_service_risk_and_impact`
 
-- Tools (read-only)
+- Tools
   - `get_all_teams()` → GET `/teams` (auto-paginates up to 200 results)
   - `get_services_by_team(team_id)` → GET `/teams/{team_id}/services`
   - `find_service_by_name(query)` → GET `/services/search?query={query}`
@@ -25,6 +25,7 @@ This MCP server exposes read-only tools and resources for exploring a Service At
   - `get_releases(start, end)` → GET `/releases/{start}/{end}`
   - `get_service_dependencies(service_id)` → GET `/services/{service_id}/dependencies`
   - `get_service_dependents(service_id)` → GET `/services/{service_id}/dependents`
+  - `create_dependency(service_id, dependency_id, version)` → POST `/services/{service_id}/dependency`
 - `get_service_risk(service_id)` → GET `/reports/services/{service_id}/risk`
   Returns a JSON risk report containing:
   - `changeRisk`: A heuristic score (0-100) and risk level (low/medium/high) indicating the potential system-wide impact of failure or modification.
@@ -56,6 +57,7 @@ Each use case is implemented with a prompt, a tool, and an equivalent resource.
 - Get releases in a date range → tool `get_releases` or resource `serviceatlas://releases/{start}/{end}`
 - Get service dependencies → tool `get_service_dependencies` or resource `serviceatlas://services/{service_id}/dependencies`
 - Get service dependents → tool `get_service_dependents` or resource `serviceatlas://services/{service_id}/dependents`
+- Create a service dependency → tool `create_dependency`
 - Get service risk report → tool `get_service_risk` or resource `serviceatlas://services/{service_id}/risk`. 
   This report is used to answer the question: "If this service changes or fails, how broadly could that impact the system?" It provides a heuristic score based on the service's position in the dependency graph.
 
