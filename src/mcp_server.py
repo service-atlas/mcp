@@ -26,6 +26,11 @@ def setup():
     mcp.mount(dependency_mcp)
 
 
+@mcp.tool("get_version")
+def get_version():
+    return {"version": "0.1.0"}
+
+
 @mcp.prompt("analyze_service_risk_and_impact")
 def analyze_service_risk_and_impact() -> str:
     """
