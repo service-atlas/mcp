@@ -115,3 +115,16 @@ def test_analyze_service_risk_and_impact_prompt_exists():
     assert "get_service_dependencies" in prompt_text
     assert "get_teams_by_service" in prompt_text
     assert "get_debts_for_service" in prompt_text
+
+
+def test_get_version_matches_toml():
+    mcp_server = load_mcp_server_module()
+    version_info = call_fn(mcp_server.get_version)
+    
+    # Read version from pyproject.toml
+    import tomllib
+    with open(os.path.join(PROJECT_ROOT, "pyproject.toml"), "rb") as f:
+        toml_data = tomllib.load(f)
+    
+    expected_version = toml_data["project"]["version"]
+    assert version_info["version"] == expected_version
