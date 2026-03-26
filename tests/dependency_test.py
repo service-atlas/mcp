@@ -96,3 +96,21 @@ def test_create_dependency_tool_no_content_returns_success_string(monkeypatch: p
 
     assert result == '{"status": "success"}'
     assert dummy.calls == [("POST", "/services/svc-1/dependency", {"id": "svc-2"})]
+
+
+def test_create_dependency_raises_error_when_service_id_missing():
+    dependency = load_dependency_module()
+    with pytest.raises(ValueError, match="service_id and dependency_id are required"):
+        call_fn(dependency.create_dependency, service_id=None, dependency_id="svc-2")
+
+
+def test_create_dependency_raises_error_when_dependency_id_missing():
+    dependency = load_dependency_module()
+    with pytest.raises(ValueError, match="service_id and dependency_id are required"):
+        call_fn(dependency.create_dependency, service_id="svc-1", dependency_id=None)
+
+
+def test_create_dependency_raises_error_when_ids_are_same():
+    dependency = load_dependency_module()
+    with pytest.raises(ValueError, match="A service cannot depend on itself"):
+        call_fn(dependency.create_dependency, service_id="svc-1", dependency_id="svc-1")

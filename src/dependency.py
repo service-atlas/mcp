@@ -34,6 +34,10 @@ def create_dependency(service_id: str, dependency_id: str, version: str = None):
     :param version: the version of the dependency
     :return: json response
     """
+    if not service_id or not dependency_id:
+        raise ValueError("service_id and dependency_id are required")
+    if service_id == dependency_id:
+        raise ValueError("A service cannot depend on itself")
     body = {"id": dependency_id}
     if version:
         body["version"] = version
