@@ -99,8 +99,8 @@ call that out explicitly as a gap to investigate.
   that a service is a safe leaf node
 - A low dependent count paired with a high change risk score is a strong signal 
   of incomplete graph coverage — flag it
-- Use get_debts_for_service to enrich risk commentary when relevant; prioritise 
-  code debt as the most operationally significant category
+- Before beginning, ask the user if debts are recorded in the system. If so, use get_debts_for_service to enrich risk 
+commentary when relevant; prioritise code debt as the most operationally significant category
 - Be concise in tool use — batch what you can, avoid redundant lookups
 """
 
