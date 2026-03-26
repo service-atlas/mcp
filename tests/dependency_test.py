@@ -76,23 +76,23 @@ def test_get_service_dependents_resource_calls_api_and_returns_data(monkeypatch:
 
 def test_create_dependency_tool_calls_api_with_post(monkeypatch: pytest.MonkeyPatch):
     dependency = load_dependency_module()
-    fake_response = {"status": "created"}
+    fake_response = None
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(dependency, "api_caller", dummy, raising=True)
 
     result = call_fn(dependency.create_dependency, service_id="svc-1", dependency_id="svc-2", version="1.0.0")
 
-    assert result == fake_response
+    assert result == '{"status": "success"}'
     assert dummy.calls == [("POST", "/services/svc-1/dependency", {"id": "svc-2", "version": "1.0.0"})]
 
 
-def test_create_dependency_tool_no_version_calls_api_with_post(monkeypatch: pytest.MonkeyPatch):
+def test_create_dependency_tool_no_content_returns_success_string(monkeypatch: pytest.MonkeyPatch):
     dependency = load_dependency_module()
-    fake_response = {"status": "created"}
+    fake_response = None
     dummy = DummyApiCaller(fake_response)
     monkeypatch.setattr(dependency, "api_caller", dummy, raising=True)
 
     result = call_fn(dependency.create_dependency, service_id="svc-1", dependency_id="svc-2")
 
-    assert result == fake_response
+    assert result == '{"status": "success"}'
     assert dummy.calls == [("POST", "/services/svc-1/dependency", {"id": "svc-2"})]
