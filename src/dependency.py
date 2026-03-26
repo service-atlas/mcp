@@ -37,7 +37,7 @@ def create_dependency(service_id: str, dependency_id: str, version: str = None):
     body = {"id": dependency_id}
     if version:
         body["version"] = version
-    return api_caller.call_post(f'/services/{service_id}/dependencies', body=body)
+    return api_caller.call_post(f'/services/{service_id}/dependency', body=body)
 
 
 
