@@ -22,14 +22,24 @@ def load_api_calls_module(reload: bool = False):
 
 
 class FakeResponse:
-    def __init__(self, json_data: Any, raise_error: Optional[Exception] = None, status_code: int = 200):
+    def __init__(self, json_data: Any, raise_error: Optional[Exception] = None, status_code: int = 200, content: Optional[bytes] = None):
         self._json_data = json_data
         self._raise_error = raise_error
         self.status_code = status_code
         self.raise_called = False
+        self._content = content
+
+    @property
+    def content(self) -> bytes:
+        if self._content is not None:
+            return self._content
+        if self.status_code == 204 or self.status_code == 201 or self._json_data is None:
+            return b""
+        import json
+        return json.dumps(self._json_data).encode("utf-8")
 
     def json(self):
-        if self.status_code == 204:
+        if not self.content:
             # Simulate requests behavior on empty response
             import requests
             raise requests.exceptions.JSONDecodeError("Expecting value", "", 0)
@@ -175,24 +185,24 @@ def test_call_post_returns_json(monkeypatch: pytest.MonkeyPatch):
     assert spy.post_calls == [("http://z/create", body, 10)]
 
 
-def test_call_post_returns_none_on_204_and_201(monkeypatch: pytest.MonkeyPatch):
+def test_call_post_returns_none_on_empty_content(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("API_URL", "http://z")
     api_calls = load_api_calls_module(reload=True)
 
-    # Test 204
-    fake_resp_204 = FakeResponse(json_data=None, status_code=204)
-    spy = RequestsSpy(fake_resp_204)
+    # Test empty content (mimicking 204/201 without content)
+    fake_resp_empty = FakeResponse(json_data=None)
+    spy = RequestsSpy(fake_resp_empty)
     monkeypatch.setattr(api_calls, "requests", spy)
 
     caller = api_calls.ApiCaller()
-    result_204 = caller.call_post("/no-content")
-    assert result_204 is None
+    result_empty = caller.call_post("/no-content")
+    assert result_empty is None
     assert spy.post_calls == [("http://z/no-content", None, 10)]
 
     # Reset spy for next call
     spy.post_calls = []
 
-    # Test 201
+    # Test explicit empty content via status code (FakeResponse handles mapping in __init__)
     fake_resp_201 = FakeResponse(json_data=None, status_code=201)
     spy.response = fake_resp_201
     result_201 = caller.call_post("/created")
