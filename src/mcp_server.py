@@ -18,12 +18,17 @@ def log(message: str):
     sys.stderr.flush()
 
 
-async def setup():
-    await mcp.import_server(debt_mcp)
-    await mcp.import_server(teams_mcp)
-    await mcp.import_server(service_mcp)
-    await mcp.import_server(release_mcp)
-    await mcp.import_server(dependency_mcp)
+def setup():
+    mcp.mount(debt_mcp)
+    mcp.mount(teams_mcp)
+    mcp.mount(service_mcp)
+    mcp.mount(release_mcp)
+    mcp.mount(dependency_mcp)
+
+
+@mcp.tool("get_version")
+def get_version():
+    return {"version": "1.0.0"}
 
 
 @mcp.prompt("analyze_service_risk_and_impact")
@@ -99,8 +104,8 @@ call that out explicitly as a gap to investigate.
   that a service is a safe leaf node
 - A low dependent count paired with a high change risk score is a strong signal 
   of incomplete graph coverage — flag it
-- Use get_debts_for_service to enrich risk commentary when relevant; prioritise 
-  code debt as the most operationally significant category
+- Before beginning, ask the user if debts are recorded in the system. If so, use get_debts_for_service to enrich risk 
+commentary when relevant; prioritise code debt as the most operationally significant category
 - Be concise in tool use — batch what you can, avoid redundant lookups
 """
 
@@ -111,7 +116,7 @@ def main():
     :return:
     """
     try:
-        asyncio.run(setup())
+        setup()
         # Run the FastMCP server with STDIO transport
         mcp.run()
     except KeyboardInterrupt:

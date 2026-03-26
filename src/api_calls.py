@@ -23,5 +23,20 @@ class ApiCaller:
         response.raise_for_status()
         return response.json()
 
+    def call_post(self, url: str, body: dict = None):
+        """
+        Calls the api with a post request
+        :param url: the url fragment to append to the base url
+        :param body: the body of the post request
+        :return: json response
+        """
+        if not url.startswith("/"):
+            url = f"/{url}"
+        response = requests.post(f"{self.__api_url}{url}", json=body, timeout=10)
+        response.raise_for_status()
+        if not response.content:
+            return None
+        return response.json()
+
 
 api_caller = ApiCaller()
