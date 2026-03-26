@@ -175,16 +175,26 @@ def test_call_post_returns_json(monkeypatch: pytest.MonkeyPatch):
     assert spy.post_calls == [("http://z/create", body, 10)]
 
 
-def test_call_post_returns_none_on_204(monkeypatch: pytest.MonkeyPatch):
+def test_call_post_returns_none_on_204_and_201(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("API_URL", "http://z")
     api_calls = load_api_calls_module(reload=True)
 
-    fake_resp = FakeResponse(json_data=None, status_code=204)
-    spy = RequestsSpy(fake_resp)
+    # Test 204
+    fake_resp_204 = FakeResponse(json_data=None, status_code=204)
+    spy = RequestsSpy(fake_resp_204)
     monkeypatch.setattr(api_calls, "requests", spy)
 
     caller = api_calls.ApiCaller()
-    result = caller.call_post("/no-content")
-
-    assert result is None
+    result_204 = caller.call_post("/no-content")
+    assert result_204 is None
     assert spy.post_calls == [("http://z/no-content", None, 10)]
+
+    # Reset spy for next call
+    spy.post_calls = []
+
+    # Test 201
+    fake_resp_201 = FakeResponse(json_data=None, status_code=201)
+    spy.response = fake_resp_201
+    result_201 = caller.call_post("/created")
+    assert result_201 is None
+    assert spy.post_calls == [("http://z/created", None, 10)]

@@ -34,7 +34,7 @@ class ApiCaller:
             url = f"/{url}"
         response = requests.post(f"{self.__api_url}{url}", json=body, timeout=10)
         response.raise_for_status()
-        if response.status_code == 204:
+        if response.status_code in [204, 201]:
             return None
         return response.json()
 
