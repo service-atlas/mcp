@@ -25,7 +25,11 @@ class DummyApiCaller:
         self.calls: List[Tuple[str, Any]] = []
 
     def call_get(self, url: str, params: dict | None = None):
-        self.calls.append((url, params))
+        self.calls.append(("GET", url, params))
+        return self.response
+
+    def call_post(self, url: str, body: dict | None = None):
+        self.calls.append(("POST", url, body))
         return self.response
 
 
@@ -62,7 +66,7 @@ def test_find_service_by_name_tool_calls_api_with_params_and_returns_data(
     result = call_fn(services.find_service_by_name, "orders")
 
     assert result == fake_response
-    assert dummy.calls == [("/services/search", {"query": "orders"})]
+    assert dummy.calls == [("GET", "/services/search", {"query": "orders"})]
 
 
 def test_find_service_by_name_resource_calls_api_with_params_and_returns_data(
@@ -78,7 +82,7 @@ def test_find_service_by_name_resource_calls_api_with_params_and_returns_data(
     result = call_fn(services.find_service_by_name_resource, "billing")
 
     assert result == fake_response
-    assert dummy.calls == [("/services/search", {"query": "billing"})]
+    assert dummy.calls == [("GET", "/services/search", {"query": "billing"})]
 
 
 def test_get_teams_by_service_tool_calls_api_and_returns_data(monkeypatch: pytest.MonkeyPatch):
@@ -93,7 +97,7 @@ def test_get_teams_by_service_tool_calls_api_and_returns_data(monkeypatch: pytes
     result = call_fn(services.get_teams_by_service, "svc-123")
 
     assert result == fake_response
-    assert dummy.calls == [("/services/svc-123/teams", None)]
+    assert dummy.calls == [("GET", "/services/svc-123/teams", None)]
 
 
 def test_get_teams_by_service_resource_calls_api_and_returns_data(
@@ -109,7 +113,7 @@ def test_get_teams_by_service_resource_calls_api_and_returns_data(
     result = call_fn(services.get_teams_by_service_resource, "svc-xyz")
 
     assert result == fake_response
-    assert dummy.calls == [("/services/svc-xyz/teams", None)]
+    assert dummy.calls == [("GET", "/services/svc-xyz/teams", None)]
 
 
 def test_prompt_get_service_risk_mentions_tool_and_resource():
@@ -131,7 +135,7 @@ def test_get_service_risk_tool_calls_api_and_returns_data(monkeypatch: pytest.Mo
     result = call_fn(services.get_service_risk, "svc-123")
 
     assert result == fake_response
-    assert dummy.calls == [("/reports/services/svc-123/risk", None)]
+    assert dummy.calls == [("GET", "/reports/services/svc-123/risk", None)]
 
 
 def test_get_service_risk_resource_calls_api_and_returns_data(monkeypatch: pytest.MonkeyPatch):
@@ -145,4 +149,87 @@ def test_get_service_risk_resource_calls_api_and_returns_data(monkeypatch: pytes
     result = call_fn(services.get_service_risk_resource, "svc-456")
 
     assert result == fake_response
-    assert dummy.calls == [("/reports/services/svc-456/risk", None)]
+    assert dummy.calls == [("GET", "/reports/services/svc-456/risk", None)]
+
+
+def test_create_service_tool_calls_api_and_returns_data(monkeypatch: pytest.MonkeyPatch):
+    services = load_services_module()
+    fake_response = {
+        "id": "new-svc-id",
+        "name": "NewService",
+        "type": "service",
+        "description": "Description",
+        "tier": 2,
+        "url": "http://example.com"
+    }
+    dummy = DummyApiCaller(fake_response)
+    monkeypatch.setattr(services, "api_caller", dummy, raising=True)
+
+    result = call_fn(
+        services.create_service,
+        name="NewService",
+        description="Description",
+        tier=2,
+        url="http://example.com"
+    )
+
+    assert result == fake_response
+    assert dummy.calls == [
+        (
+            "POST",
+            "/services",
+            {
+                "name": "NewService",
+                "description": "Description",
+                "type": "service",
+                "tier": 2,
+                "url": "http://example.com"
+            }
+        )
+    ]
+
+
+def test_create_service_tool_uses_defaults(monkeypatch: pytest.MonkeyPatch):
+    services = load_services_module()
+    fake_response = {"id": "new-svc-id"}
+    dummy = DummyApiCaller(fake_response)
+    monkeypatch.setattr(services, "api_caller", dummy, raising=True)
+
+    call_fn(services.create_service, name="Svc", description="Desc")
+
+    assert dummy.calls == [
+        (
+            "POST",
+            "/services",
+            {
+                "name": "Svc",
+                "description": "Desc",
+                "type": "service",
+                "tier": 3
+            }
+        )
+    ]
+
+
+def test_get_service_types_tool_calls_api_and_returns_data(monkeypatch: pytest.MonkeyPatch):
+    services = load_services_module()
+    fake_response = ["service", "library", "resource", "internal"]
+    dummy = DummyApiCaller(fake_response)
+    monkeypatch.setattr(services, "api_caller", dummy, raising=True)
+
+    result = call_fn(services.get_service_types)
+
+    assert result == fake_response
+    assert dummy.calls == [("GET", "/services/types", None)]
+
+
+def test_get_service_types_resource_calls_api_and_returns_data(monkeypatch: pytest.MonkeyPatch):
+    services = load_services_module()
+    fake_response = ["service", "library", "resource", "internal"]
+    dummy = DummyApiCaller(fake_response)
+    monkeypatch.setattr(services, "api_caller", dummy, raising=True)
+
+    result = call_fn(services.get_service_types_resource)
+
+    assert result == fake_response
+    assert dummy.calls == [("GET", "/services/types", None)]

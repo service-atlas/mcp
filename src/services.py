@@ -102,3 +102,40 @@ def get_service_risk_resource(service_id: str):
     :return: risk report object
     """
     return api_caller.call_get(f'/reports/services/{service_id}/risk')
+
+@service_mcp.resource(uri='serviceatlas://services/types', name='Get Service Types', mime_type='application/json')
+def get_service_types_resource():
+    """
+    Gets the list of service types
+    :return: list of service types
+    """
+    return api_caller.call_get('/services/types')
+
+@service_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Service Types"})
+def get_service_types():
+    """
+    Gets the list of service types
+    :return: list of service types
+    """
+    return api_caller.call_get('/services/types')
+
+@service_mcp.tool(annotations={"readOnlyHint": False, "title": "Create Service"})
+def create_service(name: str, description: str, type: str = "service", url: str = None, tier: int = 3):
+    """
+    Creates a new service
+    :param name: name of the service
+    :param description: description of the service
+    :param type: type of the service (defaults to "service"). Type should be expressly asked for by the user
+    :param url: optional url for the service
+    :param tier: optional tier for the service (1=Mission Critical, 2=Business Critical, 3=Supporting, 4=Non-Critical/Auxiliary, defaults to 3)
+    :return: the created service object
+    """
+    body = {
+        "name": name,
+        "description": description,
+        "type": type,
+        "tier": tier
+    }
+    if url:
+        body["url"] = url
+    return api_caller.call_post("/services", body=body)
