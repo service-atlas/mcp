@@ -28,7 +28,7 @@ def setup():
 
 @mcp.tool("get_version")
 def get_version():
-    return {"version": "1.0.0"}
+    return {"version": "1.1.0"}
 
 
 @mcp.prompt("analyze_service_risk_and_impact")
