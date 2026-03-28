@@ -143,11 +143,13 @@ def create_service(name: str, description: str = "", type: str = "service", url:
 @service_mcp.tool(annotations={"readOnlyHint": False, "title": "Update Service"})
 def update_service(service_id: str, name: str, description: str = "", type: str = "service", url: str = None, tier: int = 3):
     """
-    Creates a new service
+    Updates an existing service. It is recommended to get the service first and then update it, so all fields are updated.
     :param service_id: id of the service to update
-    :param name:  the name of the service
+    :param name:  the name of the service. WARNING: Changing the name is discouraged as it may break references in code, configs, and dependencies.
+        Only update the name if explicitly and intentionally requested by the user — do not infer or suggest name changes.
     :param description: optional description of the service
-    :param type: type of the service (defaults to "service"). Type should be expressly asked for by the user
+    :param type: type of the service (defaults to "service"). WARNING: Changing the type is discouraged as it may have downstream impacts.
+        Only update if explicitly and intentionally requested by the user — do not infer or suggest type changes.
     :param url: optional url for the service
     :param tier: optional tier for the service (1=Mission Critical, 2=Business Critical, 3=Supporting, 4=Non-Critical/Auxiliary, defaults to 3)
     :return: the created service object
