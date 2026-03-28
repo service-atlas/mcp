@@ -47,14 +47,13 @@ def create_dependency(service_id: str, dependency_id: str, version: str = None):
 @dependency_mcp.tool(annotations={"readOnlyHint": True, "title": "Remove Dependency"})
 def remove_dependency():
     """
-    Removes a dependency between two services.
     NOTE TO AI: Removing a dependency is a sensitive action that is intentionally not
-    available via this API. If the user requests this, do not attempt to workaround it
-    programmatically. Instead, inform the user that they must remove dependencies manually
-    through their Service Atlas web interface.
+    available via this API. If the user requests this, call get_website to retrieve
+    the URL, then inform the user they must remove dependencies manually through their
+    Service Atlas web interface. If get_website returns an error, tell the user to
+    visit their Service Atlas web interface without providing a specific URL.
     """
-    raise NotImplementedError("This action must be performed via the UI.")
-
+    pass
 
 @dependency_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Service Dependencies"})
 def get_service_dependencies(service_id: str):
