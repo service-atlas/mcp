@@ -56,6 +56,7 @@ class RequestsSpy:
         self.response = response
         self.get_calls: list[Tuple[str, Optional[Dict[str, Any]], Optional[int]]] = []
         self.post_calls: list[Tuple[str, Optional[Dict[str, Any]], Optional[int]]] = []
+        self.put_calls: list[Tuple[str, Optional[Dict[str, Any]], Optional[int]]] = []
 
     def get(self, url: str, params: Dict[str, Any] | None = None, timeout: Optional[int] = None):
         self.get_calls.append((url, params, timeout))
@@ -63,6 +64,10 @@ class RequestsSpy:
 
     def post(self, url: str, json: Dict[str, Any] | None = None, timeout: Optional[int] = None):
         self.post_calls.append((url, json, timeout))
+        return self.response
+
+    def put(self, url: str, json: Dict[str, Any] | None = None, timeout: Optional[int] = None):
+        self.put_calls.append((url, json, timeout))
         return self.response
 
 
@@ -208,3 +213,34 @@ def test_call_post_returns_none_on_empty_content(monkeypatch: pytest.MonkeyPatch
     result_201 = caller.call_post("/created")
     assert result_201 is None
     assert spy.post_calls == [("http://z/created", None, 10)]
+
+
+def test_call_put_returns_json(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("API_URL", "http://z")
+    api_calls = load_api_calls_module(reload=True)
+
+    payload = {"status": "updated"}
+    fake_resp = FakeResponse(json_data=payload)
+    spy = RequestsSpy(fake_resp)
+    monkeypatch.setattr(api_calls, "requests", spy)
+
+    caller = api_calls.ApiCaller()
+    body = {"name": "test-updated"}
+    result = caller.call_put("/update/1", body=body)
+
+    assert result == payload
+    assert spy.put_calls == [("http://z/update/1", body, 10)]
+
+
+def test_call_put_returns_none_on_empty_content(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("API_URL", "http://z")
+    api_calls = load_api_calls_module(reload=True)
+
+    fake_resp_empty = FakeResponse(json_data=None)
+    spy = RequestsSpy(fake_resp_empty)
+    monkeypatch.setattr(api_calls, "requests", spy)
+
+    caller = api_calls.ApiCaller()
+    result_empty = caller.call_put("/no-content")
+    assert result_empty is None
+    assert spy.put_calls == [("http://z/no-content", None, 10)]

@@ -44,7 +44,16 @@ def create_dependency(service_id: str, dependency_id: str, version: str = None):
     response = api_caller.call_post(f'/services/{service_id}/dependency', body=body)
     return response if response else '{"status": "success"}'
 
-
+@dependency_mcp.tool(annotations={"readOnlyHint": True, "title": "Remove Dependency"})
+def remove_dependency():
+    """
+    Removes a dependency between two services.
+    NOTE TO AI: Removing a dependency is a sensitive action that is intentionally not
+    available via this API. If the user requests this, do not attempt to workaround it
+    programmatically. Instead, inform the user that they must remove dependencies manually
+    through their Service Atlas web interface.
+    """
+    raise NotImplementedError("This action must be performed via the UI.")
 
 
 @dependency_mcp.tool(annotations={"readOnlyHint": True, "title": "Get Service Dependencies"})

@@ -32,6 +32,10 @@ class DummyApiCaller:
         self.calls.append(("POST", url, body))
         return self.response
 
+    def call_put(self, url: str, body: dict | None = None):
+        self.calls.append(("PUT", url, body))
+        return self.response
+
 
 def call_fn(func_or_tool, *args, **kwargs):
     if hasattr(func_or_tool, "fn"):
@@ -233,3 +237,46 @@ def test_get_service_types_resource_calls_api_and_returns_data(monkeypatch: pyte
 
     assert result == fake_response
     assert dummy.calls == [("GET", "/services/types", None)]
+
+
+def test_update_service_tool_calls_api_and_returns_data(monkeypatch: pytest.MonkeyPatch):
+    services = load_services_module()
+    fake_response = {
+        "id": "svc-123",
+        "name": "UpdatedService",
+        "type": "service",
+        "description": "Updated Description",
+        "tier": 1,
+        "url": "http://updated.example.com"
+    }
+    dummy = DummyApiCaller(fake_response)
+    monkeypatch.setattr(services, "api_caller", dummy, raising=True)
+
+    result = call_fn(
+        services.update_service,
+        service_id="svc-123",
+        name="UpdatedService",
+        description="Updated Description",
+        tier=1,
+        url="http://updated.example.com"
+    )
+
+    assert result == fake_response
+    # We expect it to use call_put eventually, but let's first test current behavior (which is POST) 
+    # and then update the code and the test.
+    # Wait, the instruction says "add tests for call_put and update_service".
+    # If I update the code to use call_put, I should test for PUT.
+    assert dummy.calls == [
+        (
+            "PUT",
+            "/services/svc-123",
+            {
+                "id": "svc-123",
+                "name": "UpdatedService",
+                "description": "Updated Description",
+                "type": "service",
+                "tier": 1,
+                "url": "http://updated.example.com"
+            }
+        )
+    ]
