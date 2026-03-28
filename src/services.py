@@ -139,3 +139,26 @@ def create_service(name: str, description: str = "", type: str = "service", url:
     if url:
         body["url"] = url
     return api_caller.call_post("/services", body=body)
+
+@service_mcp.tool(annotations={"readOnlyHint": False, "title": "Update Service"})
+def update_service(service_id: str, name: str, description: str = "", type: str = "service", url: str = None, tier: int = 3):
+    """
+    Creates a new service
+    :param service_id: id of the service to update
+    :param name:  the name of the service
+    :param description: optional description of the service
+    :param type: type of the service (defaults to "service"). Type should be expressly asked for by the user
+    :param url: optional url for the service
+    :param tier: optional tier for the service (1=Mission Critical, 2=Business Critical, 3=Supporting, 4=Non-Critical/Auxiliary, defaults to 3)
+    :return: the created service object
+    """
+    body = {
+        "id": service_id,
+        "name": name,
+        "description": description,
+        "type": type,
+        "tier": tier
+    }
+    if url:
+        body["url"] = url
+    return api_caller.call_put(f"/services/{service_id}", body=body)
