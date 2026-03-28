@@ -120,11 +120,11 @@ def get_service_types():
     return api_caller.call_get('/services/types')
 
 @service_mcp.tool(annotations={"readOnlyHint": False, "title": "Create Service"})
-def create_service(name: str, description: str, type: str = "service", url: str = None, tier: int = 3):
+def create_service(name: str, description: str = "", type: str = "service", url: str = None, tier: int = 3):
     """
     Creates a new service
     :param name: name of the service
-    :param description: description of the service
+    :param description: optional description of the service
     :param type: type of the service (defaults to "service"). Type should be expressly asked for by the user
     :param url: optional url for the service
     :param tier: optional tier for the service (1=Mission Critical, 2=Business Critical, 3=Supporting, 4=Non-Critical/Auxiliary, defaults to 3)
