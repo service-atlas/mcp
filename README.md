@@ -26,10 +26,9 @@ This MCP server exposes tools and resources for exploring a Service Atlas API: b
   - `get_service_dependencies(service_id)` → GET `/services/{service_id}/dependencies`
   - `get_service_dependents(service_id)` → GET `/services/{service_id}/dependents`
   - `create_dependency(service_id, dependency_id, version)` → POST `/services/{service_id}/dependency`
-- `get_service_risk(service_id)` → GET `/reports/services/{service_id}/risk`
-  Returns a JSON risk report containing:
-  - `changeRisk`: A heuristic score (0-100) and risk level (low/medium/high) indicating the potential system-wide impact of failure or modification.
-  - `healthRisk`: Current condition metrics including dependency count and technical debt count by category.
+  - `get_service_risk(service_id)` → GET `/reports/services/{service_id}/risk`
+  - `get_service_types()` → GET `/services/types`
+  - `create_service(name, description, type, url, tier)` → POST `/services`
 
 - Resources (MCP resources namespace)
   - `serviceatlas://teams` → All teams
@@ -42,6 +41,7 @@ This MCP server exposes tools and resources for exploring a Service Atlas API: b
   - `serviceatlas://services/{service_id}/dependencies` → Service dependencies
   - `serviceatlas://services/{service_id}/dependents` → Service dependents
   - `serviceatlas://services/{service_id}/risk` → Service risk report
+  - `serviceatlas://services/types` → Service types
 
 ## Resource Scheme
 Resources use the `serviceatlas://` scheme so that requests are routed specifically to this server.
@@ -60,6 +60,8 @@ Each use case is implemented with a prompt, a tool, and an equivalent resource.
 - Create a service dependency → tool `create_dependency`
 - Get service risk report → tool `get_service_risk` or resource `serviceatlas://services/{service_id}/risk`. 
   This report is used to answer the question: "If this service changes or fails, how broadly could that impact the system?" It provides a heuristic score based on the service's position in the dependency graph.
+- List service types → tool `get_service_types` or resource `serviceatlas://services/types`
+- Create a new service → tool `create_service`
 
 ## Running and Testing Locally
 
