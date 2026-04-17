@@ -128,3 +128,19 @@ def test_get_version_matches_toml():
     
     expected_version = toml_data["project"]["version"]
     assert version_info["version"] == expected_version
+
+
+def test_get_website_returns_url_when_env_set(monkeypatch: pytest.MonkeyPatch):
+    mcp_server = load_mcp_server_module()
+    monkeypatch.setenv("WEBSITE_URL", "https://atlas.example.com")
+    
+    result = call_fn(mcp_server.get_website)
+    assert result == {"url": "https://atlas.example.com"}
+
+
+def test_get_website_returns_error_when_env_missing(monkeypatch: pytest.MonkeyPatch):
+    mcp_server = load_mcp_server_module()
+    monkeypatch.delenv("WEBSITE_URL", raising=False)
+    
+    result = call_fn(mcp_server.get_website)
+    assert result == {"status": "error", "message": "URL is not available"}

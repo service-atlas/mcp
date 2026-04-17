@@ -1,4 +1,5 @@
 import asyncio
+import os
 import sys
 
 from fastmcp import FastMCP
@@ -28,7 +29,18 @@ def setup():
 
 @mcp.tool("get_version")
 def get_version():
-    return {"version": "1.1.0"}
+    return {"version": "1.2.0"}
+
+@mcp.tool(annotations={"readOnlyHint": True, "title": "Get Service Atlas Website"})
+def get_website():
+    """
+    Retrieves the Service Atlas website URL from the environment.
+    :return: a dictionary containing the url or an error message if the URL is not configured
+    """
+    url = os.getenv("WEBSITE_URL", "")
+    if not url:
+        return {"status": "error", "message": "URL is not available"}
+    return {"url": url}
 
 
 @mcp.prompt("analyze_service_risk_and_impact")
