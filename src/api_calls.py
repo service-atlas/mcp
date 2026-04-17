@@ -28,7 +28,7 @@ class ApiCaller:
         Calls the api with a post request
         :param url: the url fragment to append to the base url
         :param body: the body of the post request
-        :return: json response
+        :return: JSON response
         """
         if not url.startswith("/"):
             url = f"/{url}"
@@ -40,10 +40,10 @@ class ApiCaller:
 
     def call_put(self, url: str, body: dict = None):
         """
-        Calls the api with a post request
+        Calls the api with a put request
         :param url: the url fragment to append to the base url
-        :param body: the body of the post request
-        :return: json response
+        :param body: the body of the put request
+        :return: JSON response
         """
         if not url.startswith("/"):
             url = f"/{url}"
