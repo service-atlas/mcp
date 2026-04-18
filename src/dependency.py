@@ -35,7 +35,8 @@ def prompt_get_service_dependencies_and_dependents(service_id: str) -> str:
 def create_dependency(service_id: str, dependency_id: str, version: str = None, interaction_type: str = None):
     """
     Creates a dependency connection between two entities.
-    The service_id will depend on the dependency_id.
+    The service_id will depend on the dependency_id. The service_id is the consumer/caller that relies on dependency_id
+    If it is not clear what which service depends on which, ask clarifying questions.
     :param service_id: the guid for the service that will depend on the other service
     :param dependency_id: the guid for the service that is being depended on
     :param version: the version of the dependency

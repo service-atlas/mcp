@@ -29,7 +29,7 @@ def setup():
 
 @mcp.tool("get_version")
 def get_version():
-    return {"version": "1.3.0"}
+    return {"version": "1.3.1"}
 
 @mcp.tool(annotations={"readOnlyHint": True, "title": "Get Service Atlas Website"})
 def get_website():
