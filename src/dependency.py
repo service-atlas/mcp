@@ -18,20 +18,29 @@ def prompt_get_service_dependencies_and_dependents(service_id: str) -> str:
         
         To get a list of dependents for a service, use the resource: `serviceatlas://services/{service_id}/dependents`. It will return a list of dependents. 
         
-        To create a dependency connection between two entities, use the tool: `create_dependency`, passing in the 'service_id' (service that depends), 'dependency_id' (service it depends on), and optionally 'version'.
+        To create a dependency connection between two entities, use the tool: `create_dependency`, passing in the 'service_id' (service that depends), 'dependency_id' (service it depends on), and optionally 'version' and 'interaction_type'.
+        
+        'interaction_type' can be one of:
+        - 'data' (default): A direct, synchronous exchange of meaningful domain data between two services. Represents logical data flow.
+        - 'security': A dependency on a service that handles authentication, authorisation, or request routing.
+        - 'performance': A dependency on a service that exists to optimise speed or reduce load.
+        - 'async': A dependency where the interaction is fire-and-forget or event-driven.
+        - 'config': A dependency on a service that provides configuration, feature flags, or secrets at runtime.
     """
 
 
 
 
 @dependency_mcp.tool()
-def create_dependency(service_id: str, dependency_id: str, version: str = None):
+def create_dependency(service_id: str, dependency_id: str, version: str = None, interaction_type: str = None):
     """
     Creates a dependency connection between two entities.
-    The service_id will depend on the dependency_id.
+    The service_id will depend on the dependency_id. The service_id is the consumer/caller that relies on dependency_id
+    If it is not clear what which service depends on which, ask clarifying questions.
     :param service_id: the guid for the service that will depend on the other service
     :param dependency_id: the guid for the service that is being depended on
     :param version: the version of the dependency
+    :param interaction_type: the type of interaction (data, security, performance, async, config)
     :return: json response
     """
     if not service_id or not dependency_id:
@@ -41,6 +50,8 @@ def create_dependency(service_id: str, dependency_id: str, version: str = None):
     body = {"id": dependency_id}
     if version:
         body["version"] = version
+    if interaction_type:
+        body["interaction_type"] = interaction_type
     response = api_caller.call_post(f'/services/{service_id}/dependency', body=body)
     return response if response else '{"status": "success"}'
 
