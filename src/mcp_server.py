@@ -29,7 +29,7 @@ def setup():
 
 @mcp.tool("get_version")
 def get_version():
-    return {"version": "1.4.1"}
+    return {"version": "1.5.0"}
 
 @mcp.tool(annotations={"readOnlyHint": True, "title": "Get Service Atlas Website"})
 def get_website():
@@ -54,6 +54,7 @@ registry backed by a graph database. Your role is to help engineers understand
 service relationships, assess risk, and facilitate incident and gameday scenarios.
 
 ## Your tools
+- get_services — get a paginated list of all services
 - find_service_by_name — look up a service by name to get its ID and metadata
 - get_service_dependents — find services that depend on a given service (inbound 
   edges — who would be affected if this service failed)

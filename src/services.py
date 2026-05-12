@@ -5,6 +5,19 @@ from api_calls import api_caller
 service_mcp = FastMCP("Service MCP")
 
 
+@service_mcp.prompt('get_services')
+def prompt_get_services() -> str:
+    """
+    Prompt for telling the AI how to list services with pagination
+    :return:
+    """
+    return """
+        To get a list of all services, use the tool `get_services` or the resource `serviceatlas://services?page={page}`.
+        The results are paginated with 25 items per page. You should get pages as needed by incrementing the page parameter.
+        If you are looking for a specific service by name, it is often more efficient to use the `find_service_by_name` tool.
+    """
+
+
 @service_mcp.prompt('get_services_by_team')
 def prompt_get_services_by_team(team_id: str) -> str:
     """
@@ -42,6 +55,28 @@ def prompt_get_service_risk(service_id: str) -> str:
         To get the risk report for a service, use the tool `get_service_risk` or the resource `serviceatlas://services/{service_id}/risk`. 
         The report includes change risk (heuristic signal for cascading impact) and health risk (debt and dependent counts).
     """
+
+
+@service_mcp.tool(annotations={"readOnlyHint": True, "title": "Get All Services"})
+def get_services(page: int = 1):
+    """
+    Gets a paginated list of all service objects.
+    The AI should get pages as needed. If a user mentions a specific service by name, 
+    it may be more efficient to use find_service_by_name.
+    :param page: The page number to retrieve (default: 1). Page size is fixed at 25.
+    :return: a list of service objects
+    """
+    return api_caller.call_get('/services', params={"page": page, "pageSize": 25})
+
+
+@service_mcp.resource(uri='serviceatlas://services?page={page}', name='List Services', mime_type='application/json')
+def get_services_resource(page: int = 1):
+    """
+    Gets a paginated list of all service objects.
+    :param page: The page number to retrieve (default: 1). Page size is fixed at 25.
+    :return: a list of service objects
+    """
+    return api_caller.call_get('/services', params={"page": page, "pageSize": 25})
 
 
 @service_mcp.tool(annotations={"readOnlyHint": True, "title": "Find Service by Name"})
