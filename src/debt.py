@@ -50,3 +50,22 @@ def get_debts_for_service_resource(service_id: str):
     :return:
     """
     return api_caller.call_get(f'/services/{service_id}/debt')
+
+
+@debt_mcp.tool(annotations={"title": "Create Debt"})
+def create_debt(service_id: str, title: str, description: str, type: str):
+    """
+    Creates a new debt item for a service
+    :param service_id: The ID of the service
+    :param title: The title of the debt
+    :param description: A description of the debt
+    :param type: The type of debt. Allowed values: 'code', 'documentation', 'testing', 'architecture', 'infrastructure', 'security'
+    :return:
+    """
+    body = {
+        "title": title,
+        "description": description,
+        "type": type,
+        "status": "pending"
+    }
+    return api_caller.call_post(f'/services/{service_id}/debt', body=body)
