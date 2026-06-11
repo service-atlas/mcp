@@ -5,6 +5,7 @@ This MCP server exposes tools and resources for exploring a Service Atlas API: b
 
 ## Capabilities
 - Prompts that guide the AI on how to complete common tasks using the tools/resources
+  - `get_services`
   - `get_all_teams`
   - `get_services_by_team`
   - `find_service_by_name`
@@ -16,22 +17,29 @@ This MCP server exposes tools and resources for exploring a Service Atlas API: b
   - `analyze_service_risk_and_impact`
 
 - Tools
+  - `get_services(page)` → GET `/services` (25 items per page)
   - `get_all_teams()` → GET `/teams` (auto-paginates up to 200 results)
   - `get_services_by_team(team_id)` → GET `/teams/{team_id}/services`
   - `find_service_by_name(query)` → GET `/services/search?query={query}`
   - `get_teams_by_service(service_id)` → GET `/services/{service_id}/teams`
   - `get_debt()` → GET `/reports/services/debt`
   - `get_debts_for_service(service_id)` → GET `/services/{service_id}/debt`
+  - `create_debt(service_id, title, description, debt_type)` → POST `/services/{service_id}/debt`
   - `get_releases(start, end)` → GET `/releases/{start}/{end}`
   - `get_service_dependencies(service_id)` → GET `/services/{service_id}/dependencies`
   - `get_service_dependents(service_id)` → GET `/services/{service_id}/dependents`
   - `create_dependency(service_id, dependency_id, version)` → POST `/services/{service_id}/dependency`
   - `get_service_risk(service_id)` → GET `/reports/services/{service_id}/risk`
   - `get_service_types()` → GET `/services/types`
-  - `create_service(name, description, type, url, tier)` → POST `/services`
+  - `create_service(name, description, service_type, url, tier)` → POST `/services`
+  - `update_service(service_id, name, description, service_type, url, tier)` → PUT `/services/{service_id}`
+  - `remove_dependency()` → Instructs user to use web interface
+  - `get_version()` → Returns the MCP server version
+  - `get_website()` → Retrieves the Service Atlas website URL
 
 - Resources (MCP resources namespace)
   - `serviceatlas://teams` → All teams
+  - `serviceatlas://services?page={page}` → Paginated services
   - `serviceatlas://teams/{team_id}/services` → Services by team
   - `serviceatlas://services/search/{query}` → Search services by name
   - `serviceatlas://services/{service_id}/teams` → Teams by service
@@ -48,20 +56,26 @@ Resources use the `serviceatlas://` scheme so that requests are routed specifica
 
 ## Use Cases
 Each use case is implemented with a prompt, a tool, and an equivalent resource.
+- List all services (paginated) → tool `get_services` or resource `serviceatlas://services?page={page}`
 - List all teams → tool `get_all_teams` or resource `serviceatlas://teams`
 - List all services that belong to a team → tool `get_services_by_team` or resource `serviceatlas://teams/{team_id}/services`
 - Find a service by name → tool `find_service_by_name` or resource `serviceatlas://services/search/{query}`
 - Find which team owns a service → tool `get_teams_by_service` or resource `serviceatlas://services/{service_id}/teams`
 - Get tech debt report → tool `get_debt` or resource `serviceatlas://debts`
 - Get tech debt for a service → tool `get_debts_for_service` or resource `serviceatlas://debts/{service_id}`
+- Create tech debt → tool `create_debt`
 - Get releases in a date range → tool `get_releases` or resource `serviceatlas://releases/{start}/{end}`
 - Get service dependencies → tool `get_service_dependencies` or resource `serviceatlas://services/{service_id}/dependencies`
 - Get service dependents → tool `get_service_dependents` or resource `serviceatlas://services/{service_id}/dependents`
 - Create a service dependency → tool `create_dependency`
+- Remove a service dependency → tool `remove_dependency`
 - Get service risk report → tool `get_service_risk` or resource `serviceatlas://services/{service_id}/risk`. 
   This report is used to answer the question: "If this service changes or fails, how broadly could that impact the system?" It provides a heuristic score based on the service's position in the dependency graph.
 - List service types → tool `get_service_types` or resource `serviceatlas://services/types`
 - Create a new service → tool `create_service`
+- Update an existing service → tool `update_service`
+- Get MCP version → tool `get_version`
+- Get website URL → tool `get_website`
 
 ## Running and Testing Locally
 
