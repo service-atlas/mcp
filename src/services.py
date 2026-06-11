@@ -5,6 +5,19 @@ from api_calls import api_caller
 service_mcp = FastMCP("Service MCP")
 
 
+@service_mcp.prompt('get_services')
+def prompt_get_services() -> str:
+    """
+    Prompt for telling the AI how to list services with pagination
+    :return:
+    """
+    return """
+        To get a list of all services, use the tool `get_services` or the resource `serviceatlas://services?page={page}`.
+        The results are paginated with 25 items per page. You should get pages as needed by incrementing the page parameter.
+        If you are looking for a specific service by name, it is often more efficient to use the `find_service_by_name` tool.
+    """
+
+
 @service_mcp.prompt('get_services_by_team')
 def prompt_get_services_by_team(team_id: str) -> str:
     """
@@ -42,6 +55,28 @@ def prompt_get_service_risk(service_id: str) -> str:
         To get the risk report for a service, use the tool `get_service_risk` or the resource `serviceatlas://services/{service_id}/risk`. 
         The report includes change risk (heuristic signal for cascading impact) and health risk (debt and dependent counts).
     """
+
+
+@service_mcp.tool(annotations={"readOnlyHint": True, "title": "Get All Services"})
+def get_services(page: int = 1):
+    """
+    Gets a paginated list of all service objects.
+    The AI should get pages as needed. If a user mentions a specific service by name, 
+    it may be more efficient to use find_service_by_name.
+    :param page: The page number to retrieve (default: 1). Page size is fixed at 25.
+    :return: a list of service objects
+    """
+    return api_caller.call_get('/services', params={"page": page, "pageSize": 25})
+
+
+@service_mcp.resource(uri='serviceatlas://services?page={page}', name='List Services', mime_type='application/json')
+def get_services_resource(page: int = 1):
+    """
+    Gets a paginated list of all service objects.
+    :param page: The page number to retrieve (default: 1). Page size is fixed at 25.
+    :return: a list of service objects
+    """
+    return api_caller.call_get('/services', params={"page": page, "pageSize": 25})
 
 
 @service_mcp.tool(annotations={"readOnlyHint": True, "title": "Find Service by Name"})
@@ -120,12 +155,12 @@ def get_service_types():
     return api_caller.call_get('/services/types')
 
 @service_mcp.tool(annotations={"readOnlyHint": False, "title": "Create Service"})
-def create_service(name: str, description: str = "", type: str = "service", url: str = None, tier: int = 3):
+def create_service(name: str, description: str = "", service_type: str = "service", url: str = None, tier: int = 3):
     """
     Creates a new service
     :param name: name of the service
     :param description: optional description of the service
-    :param type: type of the service (defaults to "service"). Type should be expressly asked for by the user
+    :param service_type: type of the service (defaults to "service"). Type should be expressly asked for by the user
     :param url: optional url for the service
     :param tier: optional tier for the service (1=Mission Critical, 2=Business Critical, 3=Supporting, 4=Non-Critical/Auxiliary, defaults to 3)
     :return: the created service object
@@ -133,7 +168,7 @@ def create_service(name: str, description: str = "", type: str = "service", url:
     body = {
         "name": name,
         "description": description,
-        "type": type,
+        "type": service_type,
         "tier": tier
     }
     if url:
@@ -141,14 +176,14 @@ def create_service(name: str, description: str = "", type: str = "service", url:
     return api_caller.call_post("/services", body=body)
 
 @service_mcp.tool(annotations={"readOnlyHint": False, "title": "Update Service"})
-def update_service(service_id: str, name: str, description: str = "", type: str = "service", url: str = None, tier: int = 3):
+def update_service(service_id: str, name: str, description: str = "", service_type: str = "service", url: str = None, tier: int = 3):
     """
     Updates an existing service. It is recommended to get the service first and then update it, so all fields are updated.
     :param service_id: id of the service to update
     :param name:  the name of the service. WARNING: Changing the name is discouraged as it may break references in code, configs, and dependencies.
         Only update the name if explicitly and intentionally requested by the user — do not infer or suggest name changes.
     :param description: optional description of the service
-    :param type: type of the service (defaults to "service"). WARNING: Changing the type is discouraged as it may have downstream impacts.
+    :param service_type: type of the service (defaults to "service"). WARNING: Changing the type is discouraged as it may have downstream impacts.
         Only update if explicitly and intentionally requested by the user — do not infer or suggest type changes.
     :param url: optional url for the service
     :param tier: optional tier for the service (1=Mission Critical, 2=Business Critical, 3=Supporting, 4=Non-Critical/Auxiliary, defaults to 3)
@@ -158,7 +193,7 @@ def update_service(service_id: str, name: str, description: str = "", type: str 
         "id": service_id,
         "name": name,
         "description": description,
-        "type": type,
+        "type": service_type,
         "tier": tier
     }
     if url:

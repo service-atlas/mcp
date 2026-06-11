@@ -43,6 +43,37 @@ def call_fn(func_or_tool, *args, **kwargs):
     return func_or_tool(*args, **kwargs)
 
 
+def test_prompt_get_services_mentions_tool_and_resource():
+    services = load_services_module()
+    prompt = call_fn(services.prompt_get_services)
+    assert "get_services" in prompt
+    assert "serviceatlas://services?page={page}" in prompt
+
+
+def test_get_services_tool_calls_api_with_pagination(monkeypatch: pytest.MonkeyPatch):
+    services = load_services_module()
+    fake_response = [{"id": "svc-1", "name": "service 1"}]
+    dummy = DummyApiCaller(fake_response)
+    monkeypatch.setattr(services, "api_caller", dummy, raising=True)
+
+    result = call_fn(services.get_services, page=2)
+
+    assert result == fake_response
+    assert dummy.calls == [("GET", "/services", {"page": 2, "pageSize": 25})]
+
+
+def test_get_services_resource_calls_api_with_pagination(monkeypatch: pytest.MonkeyPatch):
+    services = load_services_module()
+    fake_response = [{"id": "svc-1", "name": "service 1"}]
+    dummy = DummyApiCaller(fake_response)
+    monkeypatch.setattr(services, "api_caller", dummy, raising=True)
+
+    result = call_fn(services.get_services_resource, page=3)
+
+    assert result == fake_response
+    assert dummy.calls == [("GET", "/services", {"page": 3, "pageSize": 25})]
+
+
 def test_prompt_get_services_by_team_mentions_tool_and_resource():
     services = load_services_module()
     prompt = call_fn(services.prompt_get_services_by_team, "team-123")

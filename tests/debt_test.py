@@ -28,6 +28,10 @@ class DummyApiCaller:
         self.calls.append((url, params))
         return self.response
 
+    def call_post(self, url: str, body: dict | None = None):
+        self.calls.append((url, body))
+        return self.response
+
 
 def call_fn(func_or_tool, *args, **kwargs):
     if hasattr(func_or_tool, "fn"):
@@ -99,3 +103,15 @@ def test_get_debts_for_service_resource_calls_api_and_returns_data(monkeypatch: 
 
     assert result == fake_response
     assert dummy.calls == [("/services/svc-xyz/debt", None)]
+
+
+def test_create_debt_tool_calls_api_and_returns_data(monkeypatch: pytest.MonkeyPatch):
+    debt = load_debt_module()
+    fake_response = {"id": "deb-new", "title": "New Debt", "description": "desc", "type": "code", "status": "pending"}
+    dummy = DummyApiCaller(fake_response)
+    monkeypatch.setattr(debt, "api_caller", dummy, raising=True)
+
+    result = call_fn(debt.create_debt, "svc-1", "New Debt", "desc", "code")
+
+    assert result == fake_response
+    assert dummy.calls == [("/services/svc-1/debt", {"title": "New Debt", "description": "desc", "type": "code", "status": "pending"})]
